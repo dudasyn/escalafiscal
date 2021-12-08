@@ -6,7 +6,7 @@ from escala import *
 
 st.title('Gerador de Escala - Auditores Fiscais do Município de Duque de Caxias')
 st.header('Software randomico para gerar escalas (Fazenda e Chat)')
-st.subheader('Selecione o período da escala')
+
 
 uploaded_file = st.file_uploader('Faça o upload do arquivo com a relação de fiscais...')
 if uploaded_file is not None:
@@ -22,7 +22,7 @@ if uploaded_file is not None:
         fiscais.append(Fiscal(fiscal_tables.Nome[i],fiscal_tables.inicio_ferias[i],fiscal_tables.dias_de_ferias[i]))
 
     #st.write('Relação dos fiscais:', fiscais)
-
+    st.subheader('Selecione o período da escala')
     start_date = st.date_input("Dia inicial",dt.date(2022, 1, 1))
     end_date = st.date_input("Dia Final",dt.date(2022, 1, 31))
     option = st.selectbox('O que deseja gerar?',('Fazenda', 'Fazenda e Plantão Chat (manhã e tarde)'))
