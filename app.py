@@ -39,7 +39,10 @@ if uploaded_file is not None:
         st.write(fazenda)
         st.subheader('Relação dos Fiscais e dias escalados')
         st.write(escala.gera_resumo_fiscais())
-
-
+    st.write('Colaboradores:')
+    st.write('Auditor Eduardo de Sant Ana:')
+    st.write('Auditor Felipe Alves Bento')
+    st.write('Auditor Johnatan Machado')
+    
 else:
     st.warning('Você precisa fazer upload do arquivo de fiscais')
