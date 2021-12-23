@@ -121,6 +121,11 @@ class Escala:
 
         lista_size_todos = [len(x.lista_dias_escalados) for x in lista_fiscais]
         meu_tamanho = len(fiscal.lista_dias_escalados)
+        print('Lista de todos os fiscais')
+        print(lista_size_todos)
+        print('')
+        print(f'Tamanho do fiscal {fiscal.nome} é {meu_tamanho} ')
+        print(f'Fiscal {fiscal.nome} está disponível e foi escalados nos dias {fiscal.lista_dias_escalados}')
         if meu_tamanho > min(lista_size_todos):
             return True       
              
@@ -141,7 +146,7 @@ class Escala:
 
         # 1º Teste, tenta alocar um fiscal de férias
         for fiscal in fiscais:
-            if self.esta_sendo_explorado(fiscal, fiscais_de_ferias) or (data in fiscal.lista_dias_ferias) or (data in fiscal.lista_dias_escalados):
+            if self.esta_sendo_explorado(fiscal, fiscais) or (data in fiscal.lista_dias_ferias) or (data in fiscal.lista_dias_escalados):
                 print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - geral')
             else:
                 fiscais_disponiveis.append(fiscal)
@@ -160,6 +165,7 @@ class Escala:
                     print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - demais fiscais')
                 else:
                     fiscais_disponiveis.append(fiscal)
+ 
         return fiscais_disponiveis
 
     def retorna_fiscal_disponivel(self,dia):
