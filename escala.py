@@ -2,30 +2,34 @@ import random
 import datetime as dt
 import pandas as pd
 
-class Fiscal:
-    dias_na_escala = 0
-    def __init__(self, nome, inicio_ferias, dias_de_ferias, lista_dias_escalados=[]):
-        self.nome = nome
-        self.inicio_ferias = inicio_ferias
-        self.dias_de_ferias = dias_de_ferias
-        self.lista_dias_escalados = list(lista_dias_escalados)
 
+class Fiscal:
+    def __init__(self, nome, lista_dias_ferias,lista_dias_escalados = []):
+        self.nome = nome
+        self.lista_dias_ferias = lista_dias_ferias
+        self.lista_dias_escalados = lista_dias_escalados
 
     def retorna_dias_escalados(self):
         dias = []
         for data in self.lista_dias_escalados:
             dias.append(data.day)
-
         return(dias)
 
-    def checa_ferias(self):
-        if pd.isnull(self.dias_de_ferias):
-            self.dias_de_ferias = 0
+    
+    def retorna_dias_indisponiveis(self):
+        
+        dias_indisponiveis = []
+        for dia in self.lista_dias_ferias:
+            dias_indisponiveis.append(dia)
+
+        for dia in self.lista_dias_escalados:
+            dias_indisponiveis.append(dia)
+
+        dias = [x for x in dias_indisponiveis]
+        if len(dias)==0:
             return []
-        
-        date_list = [x.day for x in [self.inicio_ferias + dt.timedelta(days=x) for x in range(int(self.dias_de_ferias))]]
-        return date_list
-        
+        return dias
+
 class Escala:
     def __init__(self, start_date, end_date,  fiscais, n_fiscais=2,n_escalas = 1):
 
@@ -43,7 +47,6 @@ class Escala:
             date = dt.datetime.strptime(feriado[0], "%Y-%m-%d").date()
             lista.append(date)
         return(lista)
-    
     
     def retorna_lista_dias_escalados(self):
         dias = []
@@ -113,72 +116,64 @@ class Escala:
             retorno = pd.concat([df_fazenda,df], axis =1)
 
         return retorno
-    
-    def checa_fiscal_disponivel(self, fiscal, dia):
-        # Primeiro verifico se o fiscal está de férias se ele estiver de férias não adianta nem verificar outra coisa pq ele nao vai estar disponivel
-        lista_de_ferias = fiscal.checa_ferias()
-        if dia.day in lista_de_ferias:
-            return False
-        else:
-            # Agora que eu sei que ele não esta de ferias, posso aloca-lo, mas tenho que ver se ele já foi alocado no dia
-            if dia in fiscal.lista_dias_escalados:
-                return False
+
+    def esta_sendo_explorado(self, fiscal,lista_fiscais):
+
+        lista_size_todos = [len(x.lista_dias_escalados) for x in lista_fiscais]
+        meu_tamanho = len(fiscal.lista_dias_escalados)
+        if meu_tamanho > min(lista_size_todos):
+            return True            
+        return False
+
+    def magic_test(self, data):
+
+        fiscais = self.fiscais.copy()
+        fiscais_disponiveis = []
+        demais_fiscais = []
+        fiscais_de_ferias = []
+
+        for fiscal in fiscais:
+            if len(fiscal.lista_dias_ferias)==0:
+                #print(f'Fiscal (demais) {fiscal.nome}')
+                demais_fiscais.append(fiscal)
             else:
-                # agora que sei que ele nao esta de ferias nem foi alocado neste dia posso escala-lo mas
-                # tenho que verificar se ele é candidato na lista
-                meu_tamanho = len(fiscal.lista_dias_escalados)
-
-                lista_size_todos = []
-
-                for fiscal in self.fiscaisbackup:
-                    lista_size_todos.append(len(fiscal.lista_dias_escalados))
-
-                if (meu_tamanho == min(lista_size_todos)):
-                    #self.fiscais.remove(fiscal)
-                    return True
-                else:
-                    # Se ele não for candidato nesta lista eu tenho que remover ele e restaurar a lista pra começar de novo
-                    if (len(self.fiscais) == 0):
-                        self.fiscais = self.fiscaisbackup.copy()
-                    return False
+               #print(f'Fiscal (ferias) {fiscal.nome}')
+                fiscais_de_ferias.append(fiscal)
 
 
-    def retorna_fiscal_disponivel(self, data):
+        for fiscal in fiscais:
 
-        random.shuffle(self.fiscais)
-        fiscalrandom = self.fiscais.pop()
+            if self.esta_sendo_explorado(fiscal, fiscais) or (data in fiscal.lista_dias_ferias) or (data in fiscal.lista_dias_escalados):
+                print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - geral')
+            else:
+                fiscais_disponiveis.append(fiscal)
 
-        if (len(self.fiscais) == 0):
-            self.fiscais = self.fiscaisbackup.copy()
+            if len(fiscais_disponiveis) == 0:
 
-        while (self.checa_fiscal_disponivel(fiscalrandom, data) == False):
-            random.shuffle(self.fiscais)
-            fiscalrandom = self.fiscais.pop()
-            if (len(self.fiscais) == 0):
-                self.fiscais = self.fiscaisbackup.copy()
+                for fiscal in demais_fiscais:
+                    if self.esta_sendo_explorado(fiscal, demais_fiscais) or (data in fiscal.lista_dias_escalados):
+                        print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - demais fiscais')
+                    else:
+                        fiscais_disponiveis.append(fiscal)
 
-        return fiscalrandom
+        return fiscais_disponiveis
 
-
+    def retorna_fiscal_disponivel(self,dia):
+        fiscais_disponiveis = self.magic_test(dia)
+        return random.choice(fiscais_disponiveis)
+        
     def gera_escala(self):
-
         delta = dt.timedelta(days=1)
         data = self.start_date
         escalas = []
         feriados = self.retorna_lista_de_feriados()
-
         for i in range(self.n_escalas):
-
             escala = {}
-
             while self.start_date <= self.end_date:
-
                 fiscais=[]
                 weekno = self.start_date.weekday()
-
                 if (weekno < 5) and not(self.start_date in feriados):
                     for i in range(self.n_fiscais):
-
                         fiscal = self.retorna_fiscal_disponivel(self.start_date)
                         fiscal.lista_dias_escalados.append(self.start_date)
                         fiscais.append(fiscal)
@@ -186,7 +181,6 @@ class Escala:
                 self.start_date += delta
             print(self.gera_resumo_fiscais())
             escalas.append(escala)
-
             self.start_date = data
             df = self.gera_df_escalas(escalas)
         return df
