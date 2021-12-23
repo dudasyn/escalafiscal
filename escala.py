@@ -14,7 +14,6 @@ class Fiscal:
         for data in self.lista_dias_escalados:
             dias.append(data.day)
         return(dias)
-
     
     def retorna_dias_indisponiveis(self):
         
@@ -134,7 +133,7 @@ class Escala:
 
         for fiscal in fiscais:
             if len(fiscal.lista_dias_ferias)==0:
-                #print(f'Fiscal (demais) {fiscal.nome}')
+                print(f'Fiscal (demais) {fiscal.nome}')
                 demais_fiscais.append(fiscal)
             else:
                #print(f'Fiscal (ferias) {fiscal.nome}')
