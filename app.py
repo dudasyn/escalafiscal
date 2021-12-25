@@ -7,7 +7,11 @@ from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
 
 st.title('Gerador de Escala - Auditores Fiscais do Município de Duque de Caxias')
-st.header('Software randomico para gerar escalas (Fazenda e Chat)')
+st.header('Aplicativo web para gerar escalas (Fazenda e Chat)')
+
+st.write('Não considera Sábados, domingos e a lista de feriados nacionais constantes neste link: https://www.cnnbrasil.com.br/nacional/veja-quais-sao-as-datas-e-feriados-nacionais-de-2022/')
+st.write("O modelo do arquivo excel pode ser baixado no link: https://github.com/dudasyn/escalafiscal/blob/main/Fiscais.xlsx")
+
 
 uploaded_file = st.file_uploader('Faça o upload do arquivo com a relação de fiscais...')
 if uploaded_file is not None:
