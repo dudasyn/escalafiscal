@@ -11,6 +11,7 @@ st.header('Aplicativo web para gerar escalas (Fazenda e Chat)')
 
 st.write('Não considera Sábados, domingos e a lista de feriados nacionais constantes neste link: https://www.cnnbrasil.com.br/nacional/veja-quais-sao-as-datas-e-feriados-nacionais-de-2022/')
 st.write("O modelo do arquivo excel pode ser baixado no link: https://github.com/dudasyn/escalafiscal/blob/main/Fiscais.xlsx")
+st.write('Não considera os dias de férias constantes na planilha.')
 
 
 uploaded_file = st.file_uploader('Faça o upload do arquivo com a relação de fiscais...')
@@ -37,31 +38,29 @@ if uploaded_file is not None:
     escala = Escala(start_date, end_date, fiscais,n_fiscais,n_escalas)
 
     fazenda = pd.DataFrame()
+    resumo = pd.DataFrame()
     if st.button('Gerar Escala'):
         fazenda = escala.gera_escala()
         st.write(fazenda)
         st.subheader('Relação dos Fiscais e dias escalados')
-        st.write(escala.gera_resumo_fiscais())
-    st.write('Colaboradores:')
-    st.write('Auditor Eduardo de Sant Ana:')
-    st.write('Auditor Felipe Alves Bento')
-    st.write('Auditor Johnatan Machado')
-    
-    def to_excel(df):
-        output = BytesIO()
-        writer = pd.ExcelWriter(output, engine='xlsxwriter')
-        df.to_excel(writer, index=False, sheet_name='Sheet1')
-        workbook = writer.book
-        worksheet = writer.sheets['Sheet1']
-        format1 = workbook.add_format({'num_format': '0.00'}) 
-        worksheet.set_column('A:A', None, format1)  
-        writer.save()
-        processed_data = output.getvalue()
-        return processed_data
-    df_xlsx = to_excel(fazenda)
-    st.download_button(label='📥 Download da Escala',
-                                data=df_xlsx ,
-                                file_name= 'escala.xlsx')
+        resumo = escala.gera_resumo_fiscais()
+        st.write(resumo)
+
+        def to_excel(df):
+            output = BytesIO()
+            writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+            format1 = workbook.add_format({'num_format': '0.00'}) 
+            worksheet.set_column('A:A', None, format1)  
+            writer.save()
+            processed_data = output.getvalue()
+            return processed_data
+        df_fazenda_excel = to_excel(fazenda)
+        #df_resumo_excel = to_excel(resumo)
+
+        st.download_button(label='📥 Download da Escala', data=df_fazenda_excel ,file_name= 'Escala.xlsx')
 
 else:
     st.warning('Você precisa fazer upload do arquivo de fiscais')
