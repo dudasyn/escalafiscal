@@ -139,7 +139,8 @@ class Escala:
         fiscais_de_ferias = []
         
         # Depois trocar por filter ou list comprehension se der
-
+        random.shuffle(fiscais)
+        random.shuffle(fiscais_de_ferias)
         for fiscal in fiscais:
             if len(fiscal.lista_dias_ferias)==0:
                 demais_fiscais.append(fiscal)
