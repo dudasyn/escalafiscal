@@ -139,8 +139,8 @@ class Escala:
         fiscais_de_ferias = []
         
         # Depois trocar por filter ou list comprehension se der
-        random.shuffle(fiscais)
-        random.shuffle(fiscais_de_ferias)
+        
+     
         for fiscal in fiscais:
             if len(fiscal.lista_dias_ferias)==0:
                 demais_fiscais.append(fiscal)
@@ -148,13 +148,14 @@ class Escala:
                 fiscais_de_ferias.append(fiscal)
 
         # 1º Teste, tento alocar todos os fiscais desde que não estejam sendo explorados, não estejam de férias ou não tenham sido escalados no dia
+        random.shuffle(fiscais)
         for fiscal in fiscais:
             fiscal_indisponivel = self.esta_sendo_explorado(fiscal, demais_fiscais) or (data in fiscal.lista_dias_ferias) or (data in fiscal.lista_dias_escalados) 
             if (fiscal_indisponivel == False):
                 fiscais_disponiveis.append(fiscal)
 
         if (len(fiscais_disponiveis) == 0):
-
+            random.shuffle(demais_fiscais)
             for fiscal in demais_fiscais:
                 fiscal_indisponivel = (data in fiscal.lista_dias_escalados) 
                 if (fiscal_indisponivel == False):
