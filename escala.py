@@ -131,13 +131,14 @@ class Escala:
             return True       
              
         return False
-
-    def magic_test(self, data):
+    def retorna_fiscal_disponivel(self, data):
 
         fiscais = self.fiscais.copy()
         fiscais_disponiveis = []
         demais_fiscais = []
         fiscais_de_ferias = []
+        
+        # Depois trocar por filter ou list comprehension se der
 
         for fiscal in fiscais:
             if len(fiscal.lista_dias_ferias)==0:
@@ -145,34 +146,23 @@ class Escala:
             else:
                 fiscais_de_ferias.append(fiscal)
 
-        # 1º Teste, tenta alocar um fiscal de férias
+        # 1º Teste, tento alocar todos os fiscais desde que não estejam sendo explorados, não estejam de férias ou não tenham sido escalados no dia
         for fiscal in fiscais:
-            if self.esta_sendo_explorado(fiscal, fiscais) or (data in fiscal.lista_dias_ferias) or (data in fiscal.lista_dias_escalados):
-                print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - geral')
-            else:
+            fiscal_indisponivel = self.esta_sendo_explorado(fiscal, demais_fiscais) or (data in fiscal.lista_dias_ferias) or (data in fiscal.lista_dias_escalados) 
+            if (fiscal_indisponivel == False):
                 fiscais_disponiveis.append(fiscal)
-        # 2º Teste, se não conseguir alocar um fiscal de férias tenta os demais fiscais fazendo checagem do dia e se esta sendo explorado
-        if len(fiscais_disponiveis) == 0:
-            for fiscal in demais_fiscais:
-                if self.esta_sendo_explorado(fiscal, demais_fiscais) or (data in fiscal.lista_dias_escalados):
-                    print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - demais fiscais')
-                else:
-                    fiscais_disponiveis.append(fiscal)
-        # 3º teste, se mesmo assim não conseguir vai escolher um que está sendo explorado mesmo
 
-        if len(fiscais_disponiveis) == 0:
-            for fiscal in demais_fiscais:
-                if (data in fiscal.lista_dias_escalados):
-                    print(f'Fiscal {fiscal.nome} não esta disponivel no dia {data.day} - demais fiscais')
-                else:
-                    fiscais_disponiveis.append(fiscal)
- 
-        return fiscais_disponiveis
+        if (len(fiscais_disponiveis) == 0):
 
-    def retorna_fiscal_disponivel(self,dia):
-        fiscais_disponiveis = self.magic_test(dia)
+            for fiscal in demais_fiscais:
+                fiscal_indisponivel = (data in fiscal.lista_dias_escalados) 
+                if (fiscal_indisponivel == False):
+                    fiscais_disponiveis.append(fiscal)
+
+        # 2º teste não deu certo acima eu tento alocar um fiscal, mesmo que esteja sendo explorado
+
         return random.choice(fiscais_disponiveis)
-        
+       
     def gera_escala(self):
         delta = dt.timedelta(days=1)
         data = self.start_date
