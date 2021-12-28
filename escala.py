@@ -15,7 +15,17 @@ class Fiscal:
             dias.append(data.day)
         return(dias)
 
-    
+
+    def calcula_desvio(self,data):
+        lista_desvios = []
+        
+        for dia_escalado in self.lista_dias_escalados:
+            lista_desvios.append(abs(dia_escalado.day - data.day))
+
+        if(len(lista_desvios)==0):
+            return 0
+        return min(lista_desvios)            
+
     def retorna_dias_indisponiveis(self):
         
         dias_indisponiveis = []
@@ -118,15 +128,32 @@ class Escala:
 
         return retorno
 
+    def retorna_fiscal_com_maximo_desvio(self, fiscais_disponiveis, data):
+    
+        maior_desvio = 0
+        print(f'Lista de fiscais disponiveis pro dia {data}')
+        for fiscal in fiscais_disponiveis:
+            desvio = fiscal.calcula_desvio(data)
+
+            print(f'Fiscal {fiscal.nome} e seu desvio é {desvio}')
+            
+            if (desvio > maior_desvio):
+                maior_desvio = desvio
+                
+        if (maior_desvio == 0):
+            return random.choice(fiscais_disponiveis)
+        else:
+            random.shuffle(fiscais_disponiveis)
+            for fiscal in fiscais_disponiveis:
+                if fiscal.calcula_desvio(data) == maior_desvio:
+                    print(f'Fiscal com maior desvio é o {fiscal.nome} que tem o desvio de {maior_desvio}')
+                    print('')
+                    return fiscal
+
     def esta_sendo_explorado(self, fiscal,lista_fiscais):
 
         lista_size_todos = [len(x.lista_dias_escalados) for x in lista_fiscais]
         meu_tamanho = len(fiscal.lista_dias_escalados)
-        print('Lista de todos os fiscais')
-        print(lista_size_todos)
-        print('')
-        print(f'Tamanho do fiscal {fiscal.nome} é {meu_tamanho} ')
-        print(f'Fiscal {fiscal.nome} está disponível e foi escalados nos dias {fiscal.lista_dias_escalados}')
         if meu_tamanho > min(lista_size_todos):
             return True       
              
@@ -139,8 +166,6 @@ class Escala:
         fiscais_de_ferias = []
         
         # Depois trocar por filter ou list comprehension se der
-        
-     
         for fiscal in fiscais:
             if len(fiscal.lista_dias_ferias)==0:
                 demais_fiscais.append(fiscal)
@@ -161,9 +186,7 @@ class Escala:
                 if (fiscal_indisponivel == False):
                     fiscais_disponiveis.append(fiscal)
 
-        # 2º teste não deu certo acima eu tento alocar um fiscal, mesmo que esteja sendo explorado
-
-        return random.choice(fiscais_disponiveis)
+        return self.retorna_fiscal_com_maximo_desvio(fiscais_disponiveis, data)
        
     def gera_escala(self):
         delta = dt.timedelta(days=1)
