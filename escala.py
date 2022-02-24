@@ -51,9 +51,11 @@ class Escala:
         self.n_escalas = n_escalas
 
     def retorna_lista_de_feriados(self):
-        feriados = [["2022-01-01", "Confraternização Universal"], ["2022-04-21", "Tiradentes"], ["2022-02-28","Carnaval - Ponto Facultativo"],["2022-03-01","Carnaval - Ponto Facultativo"],["2022-03-02","Carnaval - Quarta de Cinzas"],["2022-04-15","Paixão de Cristo"],["2022-04-21","Tiradentes"], ["2022-03-01","Carnaval - Ponto Facultativo"],["2022-05-01", "Dia do trabalhador"], ["2022-09-07", "Independência"], ["2022-06-16","Corpus Chisti"],["2022-10-12", "Padroeira do Brasil"], ["2022-11-02", "Finados"], ["2022-11-15", "Proclamação da República"], ["2022-12-25", "Natal"]]
+        feriados = [["2022-01-01", "Confraternização Universal"], ["2022-04-21", "Tiradentes"], ["2022-02-28","Carnaval - Ponto Facultativo"],["2022-03-01","Carnaval - Ponto Facultativo"],["2022-04-15","Paixão de Cristo"],["2022-04-21","Tiradentes"], ["2022-03-01","Carnaval - Ponto Facultativo"],["2022-05-01", "Dia do trabalhador"], ["2022-09-07", "Independência"], ["2022-06-16","Corpus Chisti"],["2022-10-12", "Padroeira do Brasil"], ["2022-11-02", "Finados"], ["2022-11-15", "Proclamação da República"], ["2022-12-25", "Natal"]]
                     #28 de outubro, Dia do Servidor Público – art. 236 da Lei nº 8.112, de 11 de dezembro de 1990, (ponto facultativo);       
+        # ["2022-03-02","Carnaval - Quarta de Cinzas"] - tirei a quarta de cinzas
         lista = []
+        
         for feriado in feriados:
             date = dt.datetime.strptime(feriado[0], "%Y-%m-%d").date()
             lista.append(date)
